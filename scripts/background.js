@@ -1,15 +1,23 @@
 // background.js
 
-// Function to set a value in YouTube's local storage
-function setYouTubeLocalStorageItem(key, value) {
-    chrome.tabs.query({ url: "*://*.youtube.com/*" }, function (tabs) {
-      tabs.forEach(function (tab) {
-        chrome.tabs.executeScript(tab.id, {
-          code: `localStorage.setItem("${key}", "${value}");`
-        });
-      });
-    });
+// Function to retrieve the current values from YouTube's local storage
+function getYouTubeLocalStorageValues() {
+  const values = {};
+  
+  if (typeof yt !== "undefined" && typeof yt.config_ !== "undefined") {
+    values.quality = yt.config_.get("yt-player-quality");
+    values.caption = yt.config_.get("yt-player-sticky-caption");
+    values.volume = yt.config_.get("yt-player-volume");
+    values.autonav = yt.config_.get("yt.autonav::autonav_disabled");
   }
   
-  // Example usage: set a specific value in YouTube's local storage
-  setYouTubeLocalStorageItem("yourLocalStorageKey", "yourValue");
+  return values;
+}
+
+// Listen for messages from the popup
+chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
+  if (request.action === "getLocalStorageValues") {
+    const values = getYouTubeLocalStorageValues();
+    sendResponse(values);
+  }
+});
