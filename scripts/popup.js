@@ -13,6 +13,21 @@ function sendMessageToBackgroundScript(message) {
   });
 }
 
+// Function to set a value in the local storage for a specific domain
+function setLocalStorageItem(key, value, domain) {
+  try {
+    const data = {
+      Creation: new Date().getTime(),
+      Expiration: new Date().getTime() + (365 * 24 * 60 * 60 * 1000), // 1 year expiration
+      Data: value
+    };
+    localStorage.setItem(domain ? `${domain}:${key}` : key, JSON.stringify(data));
+    console.log(`Value '${value}' set for key '${key}' in the local storage for '${domain}'.`);
+  } catch (error) {
+    console.error(`Error setting value in the local storage for '${domain}':`, error);
+  }
+}
+
 // Function to handle form submission
 function handleFormSubmit(event) {
   event.preventDefault();
@@ -22,11 +37,18 @@ function handleFormSubmit(event) {
   const volume = document.getElementById("volumeSelect").value;
   const autonav = document.getElementById("autonavSelect").value;
   
+  const youtubeDomain = "setLocalStorageItem";
+
   // Set local storage values for the selected keys
-  setYouTubeLocalStorageItem("yt-player-quality", quality);
-  setYouTubeLocalStorageItem("yt-player-sticky-caption", caption);
-  setYouTubeLocalStorageItem("yt-player-volume", volume);
-  setYouTubeLocalStorageItem("yt.autonav::autonav_disabled", autonav);
+  setLocalStorageItem("yt-player-quality", quality, youtubeDomain);
+  setLocalStorageItem("yt-player-sticky-caption", caption, youtubeDomain);
+  setLocalStorageItem("yt-player-volume", volume, youtubeDomain);
+  setLocalStorageItem("yt.autonav::autonav_disabled", autonav, youtubeDomain);
+
+  setLocalStorageItem("yt-player-quality", quality);
+  setLocalStorageItem("yt-player-sticky-caption", caption);
+  setLocalStorageItem("yt-player-volume", volume);
+  setLocalStorageItem("yt.autonav::autonav_disabled", autonav);
 }
 
 // Function to load current local storage values

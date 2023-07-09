@@ -1,23 +1,28 @@
 // background.js
 
-// Function to retrieve the current values from YouTube's local storage
-function getYouTubeLocalStorageValues() {
+// Function to retrieve the current values from the extension's local storage
+function getExtensionLocalStorageValues() {
   const values = {};
-  
-  if (typeof yt !== "undefined" && typeof yt.config_ !== "undefined") {
-    values.quality = yt.config_.get("yt-player-quality");
-    values.caption = yt.config_.get("yt-player-sticky-caption");
-    values.volume = yt.config_.get("yt-player-volume");
-    values.autonav = yt.config_.get("yt.autonav::autonav_disabled");
-  }
-  
+
+  const qualityValue = localStorage.getItem("yt-player-quality");
+  values.quality = qualityValue ? JSON.parse(qualityValue).Data : "";
+
+  const captionValue = localStorage.getItem("yt-player-sticky-caption");
+  values.caption = captionValue ? JSON.parse(captionValue).Data : "";
+
+  const volumeValue = localStorage.getItem("yt-player-volume");
+  values.volume = volumeValue ? JSON.parse(volumeValue).Data : "";
+
+  const autonavValue = localStorage.getItem("yt.autonav::autonav_disabled");
+  values.autonav = autonavValue ? JSON.parse(autonavValue).Data : "";
+
   return values;
 }
 
 // Listen for messages from the popup
 chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
-  if (request.action === "getLocalStorageValues") {
-    const values = getYouTubeLocalStorageValues();
+  if (request.action === "getExtensionLocalStorageValues") {
+    const values = getExtensionLocalStorageValues();
     sendResponse(values);
   }
 });
